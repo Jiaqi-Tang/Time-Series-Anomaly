@@ -1,0 +1,6 @@
+
+Things to cover:
+  STL decomposition
+  Stationarity / ARMA / SARIMA
+    Predicition using SARIMA, mark as anomaly if different from Predicition
+  Bayesian methods
