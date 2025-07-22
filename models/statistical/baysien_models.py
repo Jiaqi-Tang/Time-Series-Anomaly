@@ -1,37 +1,8 @@
 import numpy as np
+import pandas as pd
 from statsmodels.tsa.seasonal import STL
 import changepoint as cpt
 from scipy.stats import norm
-
-
-def get_residual_outliers(ts, fitted_vals, threshold=3):
-    residuals = ts - fitted_vals
-    z_scores = (residuals - residuals.mean()) / residuals.std()
-    return np.abs(z_scores) > threshold
-
-
-def get_prediction_outliers(ts, model_fit, alpha=0.05):
-    pred = model_fit.get_prediction(alpha=alpha)
-    conf_int = pred.conf_int()
-    lower = conf_int.iloc[:, 0]
-    upper = conf_int.iloc[:, 1]
-
-    return (ts < lower) | (ts > upper)
-
-
-def cusum(data, threshold=5, drift=0.02):
-    pos_sum = 0
-    neg_sum = 0
-    anomalies = np.zeros(len(data))
-    mean = np.mean(data)
-    for i, x in enumerate(data):
-        pos_sum = max(0, pos_sum + x - mean - drift)
-        neg_sum = min(0, neg_sum + x - mean + drift)
-        if pos_sum > threshold or neg_sum < -threshold:
-            anomalies[i] = 1
-            pos_sum = 0
-            neg_sum = 0
-    return anomalies
 
 
 def constant_hazard(lam):
