@@ -46,14 +46,11 @@ def plot_lag_with_ci(corelation_vals, conf_interval, title='ACF / PACF Lag', yla
     plt.show()
 
 
-def plot_arima_fit(ts, model_fit, title='ARIMA Model Fit'):
-    fitted_vals = model_fit.fittedvalues
-    if isinstance(ts, pd.Series):
-        fitted_vals.index = ts.index  # Align indices if needed
+def plot_fit(ts, fitted, start=0, title='ARIMA Model Fit'):
 
     plt.figure(figsize=(12, 6))
     plt.plot(ts, label='Original', linewidth=2)
-    plt.plot(fitted_vals, label='Fitted', linestyle='--')
+    plt.plot(fitted, label='Fitted', linestyle='--')
     plt.title(title)
     plt.xlabel('Time')
     plt.ylabel('Value')
