@@ -3,9 +3,14 @@ import pandas as pd
 from statsmodels.tsa.arima_process import ArmaProcess
 
 
-def check_causal(ar: np.array) -> bool:
-    ar_poly = ar[::-1]
-    return not np.any(np.abs(np.roots(ar_poly)) <= 1)
+def seasonality_fourier(t, period=50, n_harmonics=5):
+    result = np.zeros_like(t, dtype=float)
+    for k in range(1, n_harmonics + 1):
+        result += (
+            np.sin(2 * np.pi * k * t / period) +
+            np.cos(2 * np.pi * k * t / period)
+        )
+    return result
 
 
 def random_causal_arma(p, q, min_ar=1.2, max_ar=2.0, max_ma=0.5):
@@ -41,14 +46,20 @@ def random_causal_arma(p, q, min_ar=1.2, max_ar=2.0, max_ma=0.5):
     return arma_process, ar, ma
 
 
-def inject_anomaly(df, start, length, mode='shift', **kwargs):
-    end = start + length
+def inject_shift(df, start, end, shift=5):
+    assert (end >= start)
     df.loc[df.index[start:end], 'labels'] = 1
+    df.loc[df.index[start:end], 'value'] += shift
 
-    if mode == 'shift':
-        df.loc[df.index[start:end], 'value'] += kwargs.get('shift', 5)
-    elif mode == 'noise':
-        df.loc[df.index[start:end], 'value'] = np.random.normal(
-            loc=df['value'].mean(), scale=kwargs.get('scale', 1), size=length)
-    elif mode == 'flat':
-        df.loc[df.index[start:end], 'value'] = df.iloc[start, 'value']
+
+def inject_noise(df, start, end, scale=5):
+    assert (end >= start)
+    df.loc[df.index[start:end], 'labels'] = 1
+    df.loc[df.index[start:end], 'value'] = np.random.normal(
+        loc=df['value'].mean(), scale=scale, size=(end-start))
+
+
+def inject_flat(df, start, end):
+    assert (end >= start)
+    df.loc[df.index[start:end], 'labels'] = 1
+    df.loc[df.index[start:end], 'value'] = df.iloc[start, 'value']

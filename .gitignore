@@ -124,3 +124,5 @@ desktop.ini
 
 # VS Code settings cache
 __pycache__/
+
+bayesian_changepoint_detection/
