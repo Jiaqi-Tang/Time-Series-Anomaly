@@ -125,4 +125,5 @@ desktop.ini
 # VS Code settings cache
 __pycache__/
 
+# External libraries
 bayesian_changepoint_detection/
