@@ -76,7 +76,7 @@ def count_anoms(anoms: pd.DataFrame):
     return anom_count
 
 
-def SARIMA_pq_grid_search(ts: pd.Series, period: int, d: int, D: int, max_p=5, max_q=5, max_P=2, max_Q=2):
+def SARIMA_grid_search(ts: pd.Series, period: int, d: int, D: int, max_p=5, max_q=5, max_P=2, max_Q=2):
     results_table = []
 
     for p in range(max_p + 1):

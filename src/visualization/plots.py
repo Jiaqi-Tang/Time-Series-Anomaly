@@ -42,7 +42,7 @@ def plot_ts_with_anom(ts, anom, title="Time Series with Anomalies"):
 
 
 def plot_data_with_anom(df, title="Time Series with Anomalies"):
-    plt.plot(df['timestamp'], df['value'], label='Time Series', color='blue')
+    plt.plot(df['timestamp'], df['value'], label='Time Series')
 
     anomalies = df[df['labels'] == 1]
     plt.scatter(anomalies['timestamp'],

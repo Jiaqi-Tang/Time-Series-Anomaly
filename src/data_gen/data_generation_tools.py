@@ -48,18 +48,18 @@ def random_causal_arma(p, q, min_ar=1.2, max_ar=2.0, max_ma=0.5):
 
 def inject_shift(df, start, end, shift=5):
     assert (end >= start)
-    df.loc[df.index[start:end], 'labels'] = 1
+    df.loc[df.index[start:end], 'labels'] = True
     df.loc[df.index[start:end], 'value'] += shift
 
 
-def inject_noise(df, start, end, scale=5):
+def inject_noise(df, start, end, mean=0, scale=5):
     assert (end >= start)
-    df.loc[df.index[start:end], 'labels'] = 1
+    df.loc[df.index[start:end], 'labels'] = True
     df.loc[df.index[start:end], 'value'] = np.random.normal(
-        loc=df['value'].mean(), scale=scale, size=(end-start))
+        loc=mean, scale=scale, size=(end-start))
 
 
 def inject_flat(df, start, end):
     assert (end >= start)
-    df.loc[df.index[start:end], 'labels'] = 1
+    df.loc[df.index[start:end], 'labels'] = True
     df.loc[df.index[start:end], 'value'] = df.iloc[start, 'value']
