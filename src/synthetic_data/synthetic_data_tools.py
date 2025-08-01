@@ -63,3 +63,15 @@ def inject_flat(df, start, end):
     assert (end >= start)
     df.loc[df.index[start:end], 'labels'] = True
     df.loc[df.index[start:end], 'value'] = df.iloc[start, 'value']
+
+
+def load_synthetic_data(csv_file):
+    df = pd.read_csv('../data/short_seasonal.csv')
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+    ts = df.set_index("timestamp")["value"]
+    ts = ts.asfreq('ME')
+
+    lables = df.set_index("timestamp")["labels"]
+    lables = lables.asfreq('ME')
+    return df, ts, lables

@@ -1,10 +1,27 @@
 import numpy as np
 import pandas as pd
+
 import torch
 from torch.utils.data import TensorDataset, DataLoader
+from sklearn.preprocessing import StandardScaler
 
 
-def create_sliding_windows(ts: pd.Series, window_size=10):
+def standardize_residuals(resid: pd.Series) -> pd.Series:
+    mean = resid.mean()
+    std = resid.std()
+    if std == 0:
+        raise ValueError(
+            "Standard deviation is zero. Cannot standardize residuals.")
+    return (resid - mean) / std
+
+
+def standardize_ts(ts: pd.Series):
+    scaler = StandardScaler()
+    ts_scaled = scaler.fit_transform(ts.values.reshape(-1, 1))
+    return pd.Series(ts_scaled.flatten(), index=ts.index)
+
+
+def create_sliding_windows(ts, window_size=10):
     X = []
     for i in range(len(ts) - window_size):
         X.append(ts[i:i + window_size])

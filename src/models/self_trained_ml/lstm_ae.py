@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 
@@ -41,8 +42,8 @@ def train_LSTMAE(model: LSTMAutoencoder, dataloader: DataLoader, criterion, opti
             optimizer.step()
 
 
-def eval_LTSMAE_MSE(model: LSTMAutoencoder, test_data: Tensor):
+def eval_LTSMAE(model, test_data: Tensor, idx: int = 0):
     model.eval()
     with torch.no_grad():
         recon = model(test_data)
-        return torch.mean((recon - test_data) ** 2, dim=(1, 2))
+    return torch.mean((recon - test_data) ** 2, dim=(1, 2))
