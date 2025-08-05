@@ -48,8 +48,8 @@ def SARIMA_grid_search(ts: pd.Series, period: int, d: int, D: int, max_p=5, max_
                                 ts[offset:] > conf_int.iloc[:, 1])
 
                             results_table.append({
-                                'order': (p, 1, q),
-                                'seasonal_order': (P, 1, Q, 12),
+                                'order': (p, d, q),
+                                'seasonal_order': (P, D, Q, 12),
                                 'AIC': aic,
                                 'BIC': bic,
                                 'model': model_fit,

@@ -1,9 +1,11 @@
-import matplotlib.pyplot as plt
+import pandas as pd
 import torch
 import torch.nn as nn
-
 from torch import Tensor
 from torch.utils.data import DataLoader
+import torch.optim as optim
+
+from src.models.preprocessing import standardize_ts, create_sliding_windows, np_to_dataloader
 
 
 class LSTMAutoencoder(nn.Module):
@@ -42,8 +44,25 @@ def train_LSTMAE(model: LSTMAutoencoder, dataloader: DataLoader, criterion, opti
             optimizer.step()
 
 
-def eval_LTSMAE(model, test_data: Tensor, idx: int = 0):
+def eval_LSTMAE(model, test_data: Tensor, idx: int = 0):
     model.eval()
     with torch.no_grad():
         recon = model(test_data)
     return torch.mean((recon - test_data) ** 2, dim=(1, 2))
+
+
+def model_LSTMAE(ts: pd.Series, window_size=20, batch_size=16, hidden_dim=16, latent_dim=16, learning_rate=1e-2, epochs=50):
+    g = torch.Generator()
+    g.manual_seed(13)
+
+    windows = create_sliding_windows(
+        standardize_ts(ts), window_size=window_size)
+    data_loader = np_to_dataloader(windows, batch_size=batch_size, generator=g)
+
+    model = LSTMAutoencoder(hidden_dim=hidden_dim, latent_dim=latent_dim)
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    train_LSTMAE(model, data_loader, criterion=criterion,
+                 optimizer=optimizer, epochs=epochs)
+    return eval_LSTMAE(model, test_data=torch.tensor(windows, dtype=torch.float32).unsqueeze(-1))
