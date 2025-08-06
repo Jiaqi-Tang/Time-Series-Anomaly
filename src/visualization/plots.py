@@ -61,7 +61,7 @@ def plot_scatter(resid: pd.Series, hlines=None, title="Residual plot"):
     plt.show()
 
 
-def plot_lag_with_ci(corelation_vals, conf_interval, title='ACF / PACF Lag'):
+def plot_lag(corelation_vals, conf_interval, title='ACF / PACF Lag'):
     n = np.arange(len(corelation_vals))
 
     plt.stem(n, corelation_vals)
