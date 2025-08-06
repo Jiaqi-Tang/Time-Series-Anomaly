@@ -1,13 +1,6 @@
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.stattools import adfuller, acf, pacf
-
-import warnings
-
-from scipy.stats import norm
-
 import numpy as np
-import math
+import warnings
 
 from src.visualization.plots import *
 
@@ -59,7 +52,6 @@ def SARIMA_grid_search(ts: pd.Series, period: int, d: int, D: int, max_p=5, max_
                                 'warnings': w,
                                 'error': None
                             })
-                        # plot_fit(ts, model_fit.fittedvalues[13:], CI=conf_int, anom=anom)
 
                     except Exception as e:
                         results_table.append({

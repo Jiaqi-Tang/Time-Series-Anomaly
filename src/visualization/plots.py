@@ -89,3 +89,15 @@ def plot_cusum(cusum_df: pd.DataFrame, threshold):
     plt.title('CUSUM over Time')
     plt.legend()
     plt.show()
+
+
+def plot_training_accuracy(losses, title="Training Loss"):
+    plt.figure(figsize=(12, 5))
+    plt.plot(losses)
+
+    plt.xlabel("Epoch")
+    plt.ylabel("Training Loss (MSE)")
+    plt.title(title)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
