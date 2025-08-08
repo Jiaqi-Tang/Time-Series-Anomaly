@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 import numpy as np
 import pandas as pd
 
@@ -61,6 +63,31 @@ def plot_scatter(resid: pd.Series, hlines=None, title="Residual plot"):
     plt.show()
 
 
+def plot_multi_variate(df: pd.DataFrame, n_cols=3):
+    n_rows = int(np.ceil(df.shape[1] / n_cols))
+
+    fig, axes = plt.subplots(
+        n_rows, n_cols, figsize=(15, n_rows * 3), sharex=True)
+    axes = axes.flatten()
+
+    for i, col in enumerate(df.columns):
+        axes[i].plot(df[col])
+        axes[i].set_title(f'Feature {col}')
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_hist(values, bins=50, alpha=0.5, threshold=None, title="Histogram"):
+    plt.hist(values, bins=bins, alpha=alpha, label="Values")
+    if threshold is not None:
+        plt.axvline(threshold, color='red', linestyle='--', label='Threshold')
+    plt.legend()
+    plt.title(title)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_lag(corelation_vals, conf_interval, title='ACF / PACF Lag'):
     n = np.arange(len(corelation_vals))
 
@@ -101,3 +128,11 @@ def plot_training_accuracy(losses, title="Training Loss"):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+
+def plot_state_space(R, sparsity, density_matrix):
+    plt.pcolor(np.array(range(0, len(R[:, 0]), sparsity)),
+               np.array(range(0, len(R[:, 0]), sparsity)),
+               density_matrix,
+               cmap=cm.Greys, vmin=0, vmax=density_matrix.max(),
+               shading='auto')

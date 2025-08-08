@@ -15,10 +15,19 @@ def standardize_residuals(resid: pd.Series) -> pd.Series:
     return (resid - mean) / std
 
 
-def standardize_ts(ts: pd.Series):
+def standardize_ts(ts):
     scaler = StandardScaler()
-    ts_scaled = scaler.fit_transform(ts.values.reshape(-1, 1))
-    return pd.Series(ts_scaled.flatten(), index=ts.index)
+
+    if isinstance(ts, pd.Series):
+        ts_scaled = scaler.fit_transform(ts.values.reshape(-1, 1)).flatten()
+        return pd.Series(ts_scaled, index=ts.index, name=ts.name)
+
+    elif isinstance(ts, pd.DataFrame):
+        ts_scaled = scaler.fit_transform(ts)
+        return pd.DataFrame(ts_scaled, index=ts.index, columns=ts.columns)
+
+    else:
+        raise TypeError("Input must be a pandas Series or DataFrame")
 
 
 def create_sliding_windows(ts, window_size=10):
