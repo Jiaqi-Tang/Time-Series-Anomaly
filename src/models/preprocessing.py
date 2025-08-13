@@ -31,6 +31,11 @@ def standardize_ts(ts):
 
 
 def create_sliding_windows(ts, window_size=10):
+    ts = np.array(ts)
+
+    if ts.ndim == 1:
+        ts = ts[:, None]
+
     X = []
     for i in range(len(ts) - window_size):
         X.append(ts[i:i + window_size])
@@ -38,7 +43,7 @@ def create_sliding_windows(ts, window_size=10):
 
 
 def np_to_dataloader(np_arr: np.array, batch_size=16, generator=None):
-    tensor_data = torch.tensor(np_arr, dtype=torch.float32).unsqueeze(-1)
+    tensor_data = torch.tensor(np_arr, dtype=torch.float32)
     dataset = TensorDataset(tensor_data)
     return DataLoader(dataset, batch_size=batch_size, shuffle=True, generator=generator)
 

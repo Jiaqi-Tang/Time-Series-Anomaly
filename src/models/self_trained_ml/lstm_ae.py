@@ -64,7 +64,8 @@ def eval_LSTMAE(model, test_data: Tensor, idx: int = 0):
     return torch.mean((recon - test_data) ** 2, dim=(1, 2))
 
 
-def model_LSTMAE(ts: pd.Series, window_size=20, batch_size=16, hidden_dim=16, latent_dim=16, learning_rate=1e-2, epochs=50, plot_accuracy=False):
+def model_LSTMAE(ts: pd.Series, window_size=20, batch_size=16, hidden_dim=16, latent_dim=16, num_layers=1,
+                 learning_rate=1e-2, epochs=50, plot_accuracy=False):
     g = torch.Generator()
     g.manual_seed(13)
 
@@ -72,7 +73,10 @@ def model_LSTMAE(ts: pd.Series, window_size=20, batch_size=16, hidden_dim=16, la
         standardize_ts(ts), window_size=window_size)
     data_loader = np_to_dataloader(windows, batch_size=batch_size, generator=g)
 
-    model = LSTMAutoencoder(hidden_dim=hidden_dim, latent_dim=latent_dim)
+    input_dim = next(iter(data_loader))[0].shape[-1]
+
+    model = LSTMAutoencoder(input_dim=input_dim,
+                            hidden_dim=hidden_dim, latent_dim=latent_dim, num_layers=num_layers)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -82,5 +86,5 @@ def model_LSTMAE(ts: pd.Series, window_size=20, batch_size=16, hidden_dim=16, la
         plot_training_accuracy(losses, title="Taring loss of LSTM-AE")
 
     reconstruction_error = eval_LSTMAE(model, test_data=torch.tensor(
-        windows, dtype=torch.float32).unsqueeze(-1))
-    return reconstruction_error
+        windows, dtype=torch.float32))
+    return reconstruction_error, model
