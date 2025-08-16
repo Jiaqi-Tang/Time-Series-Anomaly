@@ -62,16 +62,55 @@ def inject_noise(df, start, end, mean=0, scale=5):
 def inject_flat(df, start, end):
     assert (end >= start)
     df.loc[df.index[start:end], 'labels'] = True
-    df.loc[df.index[start:end], 'value'] = df.iloc[start, 'value']
+    df.loc[df.index[start:end], 'value'] = df.loc[df.index[start], 'value']
 
 
-def load_synthetic_data(csv_file):
-    df = pd.read_csv('../data/short_seasonal.csv')
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+def load_synthetic_data(csv_file, as_freq=None):
+    df = pd.read_csv(csv_file)
+    if as_freq:
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
 
     ts = df.set_index("timestamp")["value"]
-    ts = ts.asfreq('ME')
+    labels = df.set_index("timestamp")["labels"]
 
-    lables = df.set_index("timestamp")["labels"]
-    lables = lables.asfreq('ME')
-    return df, ts, lables
+    if as_freq:
+        ts = ts.asfreq(as_freq)
+        labels = labels.asfreq(as_freq)
+
+    return df, ts, labels
+
+
+def gen_damped_oscillator(
+    A=1.0, zeta=0.1, omega=2*np.pi, phi=0.0,
+    dt=0.01, T=10.0, sigma_meas=0.05,
+    start_time="2025-01-01 00:00:00"
+):
+    rng = np.random.default_rng()
+    t = np.arange(0, T, dt)  # in seconds
+    omega_d = omega * np.sqrt(1 - zeta**2)
+
+    # True states
+    x_true = A * np.exp(-zeta * omega * t) * np.cos(omega_d * t + phi)
+    v_true = A * np.exp(-zeta * omega * t) * (
+        -zeta * omega * np.cos(omega_d * t + phi)
+        - omega_d * np.sin(omega_d * t + phi)
+    )
+
+    # Measurements (position only)
+    y_meas = x_true + rng.normal(0.0, sigma_meas, size=t.size)
+
+    # Optional anomalies
+    is_anom = np.zeros_like(t, dtype=bool)
+
+    # Convert to datetime
+    start_dt = pd.Timestamp(start_time)
+    timestamps = start_dt + pd.to_timedelta(t, unit="s")
+
+    df = pd.DataFrame({
+        "timestamp": timestamps,
+        "x_true": x_true,
+        "v_true": v_true,
+        "value": y_meas,
+        "labels": is_anom
+    })
+    return df
