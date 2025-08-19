@@ -1,10 +1,10 @@
 from statsmodels.tsa.statespace.sarimax import SARIMAX
+import pandas as pd
 import numpy as np
 import warnings
 
-from src.visualization.plots import *
 
-
+# Counts the number of models that marked each point as anomaly
 def count_anoms(anoms: pd.DataFrame):
     anom_count = None
     for i, row in anoms.iterrows():
@@ -16,6 +16,7 @@ def count_anoms(anoms: pd.DataFrame):
     return anom_count
 
 
+# SARIMA grid search for model selection
 def SARIMA_grid_search(ts: pd.Series, period: int, d: int, D: int, max_p=5, max_q=5, max_P=2, max_Q=2):
     results_table = []
 

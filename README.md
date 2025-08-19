@@ -18,7 +18,7 @@ See `/notebooks` for detailed reports on each dataset.
 
 **Models**:
 
-- Classical/statistical: STL, SARIMA, Kalman filters, GARCH, BOCPD, CUSUM
+- Classical/statistical: STL, SARIMA, Kalman filters, GARCH, BOCPD, CUSUM, MVN
 - Machine learning: LSTM Autoencoder, Isolation Forest
 - Pre-trained: Prophet
   Documented strengths, weaknesses, and assumptions of each model when applied to different datasets.

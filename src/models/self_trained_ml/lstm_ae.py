@@ -9,6 +9,7 @@ from src.models.preprocessing import standardize_ts, create_sliding_windows, np_
 from src.visualization.plots import plot_training_accuracy
 
 
+# Custom LSTM-AE class
 class LSTMAutoencoder(nn.Module):
     def __init__(self, input_dim=1, hidden_dim=64, latent_dim=32, num_layers=1):
         super().__init__()
@@ -33,6 +34,7 @@ class LSTMAutoencoder(nn.Module):
         return out
 
 
+# For training LSTM
 def train_LSTMAE(model: LSTMAutoencoder, dataloader: DataLoader, criterion, optimizer, epochs=100):
     epoch_losses = []
 
@@ -57,6 +59,7 @@ def train_LSTMAE(model: LSTMAutoencoder, dataloader: DataLoader, criterion, opti
     return epoch_losses
 
 
+# For testing / evaluating LSTM-AE
 def eval_LSTMAE(model, test_data: Tensor, idx: int = 0):
     model.eval()
     with torch.no_grad():
@@ -64,6 +67,7 @@ def eval_LSTMAE(model, test_data: Tensor, idx: int = 0):
     return torch.mean((recon - test_data) ** 2, dim=(1, 2))
 
 
+# Wrapper function for LSTM-AE model
 def model_LSTMAE(ts: pd.Series, window_size=20, batch_size=16, hidden_dim=16, latent_dim=16, num_layers=1,
                  learning_rate=1e-2, epochs=50, plot_accuracy=False):
     g = torch.Generator()

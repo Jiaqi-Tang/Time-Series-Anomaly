@@ -18,6 +18,7 @@ def rolling_residuals(residuals, window=10):
     return z_scores
 
 
+# Gets rolling variance
 def rolling_variance(ts: pd.Series, window=10):
     rolling_std = ts.rolling(window=window).std()
     return rolling_std

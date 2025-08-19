@@ -6,6 +6,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from sklearn.preprocessing import StandardScaler
 
 
+# Standardize residuals
 def standardize_residuals(resid: pd.Series) -> pd.Series:
     mean = resid.mean()
     std = resid.std()
@@ -15,6 +16,7 @@ def standardize_residuals(resid: pd.Series) -> pd.Series:
     return (resid - mean) / std
 
 
+# Standardizes both single and multi-variate time series
 def standardize_ts(ts):
     scaler = StandardScaler()
 
@@ -30,6 +32,7 @@ def standardize_ts(ts):
         raise TypeError("Input must be a pandas Series or DataFrame")
 
 
+# Creates sliding windows for a time series
 def create_sliding_windows(ts, window_size=10):
     ts = np.array(ts)
 
@@ -42,11 +45,13 @@ def create_sliding_windows(ts, window_size=10):
     return np.array(X)
 
 
+# Converts np array to Dataloader
 def np_to_dataloader(np_arr: np.array, batch_size=16, generator=None):
     tensor_data = torch.tensor(np_arr, dtype=torch.float32)
     dataset = TensorDataset(tensor_data)
     return DataLoader(dataset, batch_size=batch_size, shuffle=True, generator=generator)
 
 
+# Converts pd series to Dataloader
 def ts_to_dataloader(ts: pd.Series, window_size=10, batch_size=16):
     return np_to_dataloader(create_sliding_windows(ts, window_size=window_size), batch_size=batch_size)

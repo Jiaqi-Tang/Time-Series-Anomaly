@@ -2,6 +2,7 @@ from statsmodels.tsa.statespace.structural import UnobservedComponents
 import pandas as pd
 
 
+# Wrapper function for local level kalman filters
 def kalman_local_level(ts: pd.Series):
     ts = ts.dropna()
     ts.index = pd.to_datetime(ts.index)
@@ -10,7 +11,6 @@ def kalman_local_level(ts: pd.Series):
 
     result = model.fit(disp=False)
 
-    # Extract smoothed level (latent trend)
     level = pd.Series(result.smoothed_state[0], index=ts.index, name='level')
     slope = pd.Series(result.smoothed_state[1], index=ts.index, name='slope')
 
@@ -24,12 +24,8 @@ def kalman_local_level(ts: pd.Series):
     }
 
 
+# Wrapper function for Kalman Filter cycle for damped ocsillation modeling
 def kalman_cycle(ts: pd.Series, period: float, allow_drift=True):
-    """
-    Kalman filter for an oscillator using a stochastic cycle.
-    period: oscillation period in *time steps* (not seconds; convert using your sampling dt).
-    allow_drift: if True, cycle is stochastic (amplitude/phase may drift); if False, nearly deterministic.
-    """
     ts = ts.dropna()
     ts.index = pd.to_datetime(ts.index)
 
@@ -37,22 +33,18 @@ def kalman_cycle(ts: pd.Series, period: float, allow_drift=True):
 
     model = UnobservedComponents(
         ts,
-        level=False,                 # <-- no local level
-        cycle=True,                  # <-- include cycle component
+        level=False,
+        cycle=True,
         stochastic_cycle=False,
-        damped_cycle=True,          # set True if you want a built-in damping factor
-        # fixes the period exactly; widen for estimation
+        damped_cycle=True,
         cycle_period_bounds=(lb, ub)
     )
 
     result = model.fit(disp=False)
 
-    # Get the estimated cycle component and residuals
-    # (API varies slightly across statsmodels versions; try the named states first)
     try:
         cycle = result.states.smoothed['cycle']
     except Exception:
-        # Fall back to the first state if names aren't available
         cycle = pd.Series(
             result.smoothed_state[0], index=ts.index, name='cycle')
 
